@@ -9,6 +9,6 @@ const ChatListSchema = new mongoose.Schema({
 
 });
 
-module.exports = ChatListSchema
+module.exports = mongoose.model("ChatList", ChatListSchema)
 
 
