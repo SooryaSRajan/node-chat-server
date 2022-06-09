@@ -2,6 +2,8 @@ const express = require("express")
 const app = express()
 const PORT = process.env.PORT || 8000
 
+//TODO: Import and use routes
+
 app.use(express.json())
 app.use(express.urlencoded({extended: true}));
 
