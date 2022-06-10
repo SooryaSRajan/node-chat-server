@@ -10,7 +10,7 @@ const server = http.createServer(app);
 //Route Imports
 const AuthenticationRoute = require("./routes/auth")
 const UserRoute = require("./routes/users")
-
+const ChatsRoute = require("./routes/chat")
 //Middlewares
 app.use(express.json())
 app.use(express.urlencoded({extended: true}));
@@ -26,6 +26,8 @@ const PORT = process.env.PORT || 8000
 //Routes
 app.use("/auth", AuthenticationRoute)
 app.use("/user", UserRoute)
+app.use("/chats", ChatsRoute)
+
 app.get("/", (req, res) => {
     res.send(`Server running on port ${PORT}`)
 })
