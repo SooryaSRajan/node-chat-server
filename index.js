@@ -1,7 +1,10 @@
 //Library imports and declaration
 const express = require("express")
 const morgan = require('morgan')
+const http = require('http');
 const app = express()
+const server = http.createServer(app);
+
 
 //TODO: Import and use routes
 //Route Imports
@@ -15,6 +18,8 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
 
 //Configurations
 require("./config/database_connection")();
+require("./socket/socket_server")(server)
+
 const PORT = process.env.PORT || 8000
 
 
@@ -25,7 +30,10 @@ app.get("/", (req, res) => {
     res.send(`Server running on port ${PORT}`)
 })
 
+//Sockets
+
+
 //Port setup and server start
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
