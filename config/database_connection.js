@@ -9,7 +9,7 @@ function ConnectMongoDBDatabase() {
     );
 
     databaseConnection.then(() => {
-        console.log("Database connection was successful!");
+        console.log("Connected to mongoDB database successfully");
     });
     databaseConnection.catch((error) => {
         console.log(`Database connection refused`, error);
