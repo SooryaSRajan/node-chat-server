@@ -39,6 +39,8 @@ module.exports = function (server) {
 
     io.on('connection', (socket) => {
 
+        socket.broadcast.emit("status", socket.user.userName, "ONLINE")
+
         socket.user.chatListId.forEach((data) => {
             let chatId = data.chatId
             socket.on(chatId.toString(), async (payload) => {
@@ -53,6 +55,7 @@ module.exports = function (server) {
         })
 
         socket.on('disconnect', () => {
+            socket.broadcast.emit("status", socket.user.userName, "OFFLINE")
             console.log('user disconnected');
         });
     });
