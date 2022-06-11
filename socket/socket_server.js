@@ -3,8 +3,12 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user_model");
 const ChatList = require("../models/chat_list_model")
 
-module.exports = function (server) {
-    const io = new Server(server);
+let io;
+
+exports.setupSocket = (server) => {
+    io = new Server(server);
+
+    console.log("SETUP COMPLETE")
 
     io.use((socket, next) => {
         let receiveToken = socket.handshake.headers[process.env.TOKEN]
@@ -36,7 +40,6 @@ module.exports = function (server) {
         }
     });
 
-
     io.on('connection', (socket) => {
 
         socket.broadcast.emit("status", socket.user.userName, "ONLINE")
@@ -59,5 +62,8 @@ module.exports = function (server) {
             console.log('user disconnected');
         });
     });
+}
 
+exports.io = () => {
+    return io
 }

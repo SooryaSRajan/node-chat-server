@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const {passwordStrength} = require('check-password-strength')
 const User = require("../models/user_model")
+const {io} = require("../socket/socket_server");
 const userNameRegex = /^[a-z0-9_.]+$/;
 
 router.post("/login", function (req, res) {
@@ -53,7 +54,6 @@ router.post("/login", function (req, res) {
 router.post("/register", function (req, res) {
 
     const {profileName, userName, password} = req.body;
-
 
     //validate
     if (!profileName) {
@@ -127,6 +127,11 @@ router.post("/register", function (req, res) {
                     res.status(500).json({message: "Error creating user"});
                     return;
                 }
+
+                io().emit("new_user", {
+                    profileName: profileName,
+                    userName: userName,
+                })
 
                 res.status(200).json({message: "User created", token: newUser.generateJWT()});
             });
