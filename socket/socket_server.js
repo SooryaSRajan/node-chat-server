@@ -8,6 +8,14 @@ let io;
 exports.setupSocket = (server) => {
     io = new Server(server);
 
+    User.find({}, (err, user) => {
+        user.forEach((userData) => {
+            console.log()
+            userData.onlineUsers = []
+            userData.save()
+        })
+    })
+
     io.use((socket, next) => {
         let receiveToken = socket.handshake.headers[process.env.TOKEN]
         if (!receiveToken) {
