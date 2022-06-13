@@ -1,11 +1,9 @@
-//TODO: Complete user route
 const express = require("express")
 const router = express.Router()
 const User = require("../models/user_model")
 const Auth = require("../middleware/auth")
-const ChatList = require("../models/chat_list_model")
 
-router.post("/users", Auth, (req, res) => {
+router.get("/users", Auth, (req, res) => {
 
     const userName = req.user.userName
 
