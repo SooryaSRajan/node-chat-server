@@ -76,12 +76,16 @@ exports.setupSocket = (server) => {
 
         //Listener to get message and id, adds message to message list based on id
         socket.on('message', async (message, chatId) => {
-            let date = Date.now()
-            const chatList = await ChatList.findById(chatId)
-            chatList.chats.push({message: message, date: date, sentBy: socket.user.userName})
-            await chatList.save()
-            socket.broadcast.emit(chatId.toString(), message, socket.user.userName, date);
-            console.log("Message from chat ID: ", chatId.toString(), "message:", message)
+            try {
+                let date = Date.now()
+                const chatList = await ChatList.findById(chatId)
+                chatList.chats.push({message: message, date: date, sentBy: socket.user.userName})
+                await chatList.save()
+                socket.broadcast.emit(chatId.toString(), message, socket.user.userName, date);
+                console.log("Message from chat ID: ", chatId.toString(), "message:", message)
+            } catch (e) {
+                console.log(e)
+            }
         })
 
         socket.on('disconnect', () => {
