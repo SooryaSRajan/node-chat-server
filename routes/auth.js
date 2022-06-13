@@ -128,10 +128,7 @@ router.post("/register", function (req, res) {
                     return;
                 }
 
-                io().emit("new_user", {
-                    profileName: profileName,
-                    userName: userName,
-                })
+                io().emit("new_user", profileName, userName)
 
                 res.status(200).json({message: "User created", token: newUser.generateJWT()});
             });
