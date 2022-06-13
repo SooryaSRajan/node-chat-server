@@ -49,10 +49,11 @@ exports.setupSocket = (server) => {
             socket.on(chatId.toString(), async (payload) => {
 
                 const chatList = await ChatList.findById(chatId)
-                chatList.chats.push({message: payload, date: Date.now()})
+                let date = Date.now()
+                chatList.chats.push({message: payload, date: date, sentBy: socket.user.userName})
                 await chatList.save()
 
-                socket.broadcast.emit(chatId.toString(), payload, socket.user.profileName);
+                socket.broadcast.emit(chatId.toString(), payload, socket.user.userName, date);
                 console.log("Message from chat ID: ", chatId.toString(), "message:", payload)
             })
         })

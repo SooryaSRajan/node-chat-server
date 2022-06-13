@@ -11,7 +11,10 @@ const ChatSchema = new mongoose.Schema({
         default: Date.now,
         required: true
     },
-
+    sentBy: {
+        type: String,
+        required: true
+    }
 
 });
 

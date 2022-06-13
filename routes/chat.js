@@ -74,7 +74,7 @@ router.get("/:userName", Auth, (req, res) => {
                 if (err) {
                     return res.status(500).json({message: "Error while trying to save user", err: err})
                 }
-                return res.status(200).json({message: "Chat group already exists, chats are attached", chatId: chatId.chatId, chats: chats})
+                return res.status(200).json({message: "Chat group already exists, chats are attached", chatId: chatId.chatId, chats: chats['chats']})
             })
         }
     })
