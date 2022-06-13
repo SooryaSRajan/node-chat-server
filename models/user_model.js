@@ -30,6 +30,11 @@ const UserSchema = new mongoose.Schema({
         }, 'password should be longer and must have numbers']
     },
 
+    onlineUsers: {
+        type: [String],
+        default: []
+    },
+
     chatListId: {
         type: [{
             userId: mongoose.Schema.Types.ObjectId,

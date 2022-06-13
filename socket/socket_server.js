@@ -8,8 +8,6 @@ let io;
 exports.setupSocket = (server) => {
     io = new Server(server);
 
-    console.log("SETUP COMPLETE")
-
     io.use((socket, next) => {
         let receiveToken = socket.handshake.headers[process.env.TOKEN]
         if (!receiveToken) {
@@ -18,7 +16,6 @@ exports.setupSocket = (server) => {
 
         try {
             const decodedToken = jwt.verify(receiveToken, process.env.JWT_SECRET_KEY);
-            socket.user = decodedToken
 
             User.findById(decodedToken._id, (err, user) => {
                 if (err) {
@@ -42,24 +39,56 @@ exports.setupSocket = (server) => {
 
     io.on('connection', (socket) => {
 
-        socket.broadcast.emit("status", socket.user.userName, "ONLINE")
+        console.log(socket.user.userName, 'connected')
 
-        socket.user.chatListId.forEach((data) => {
-            let chatId = data.chatId
-            socket.on(chatId.toString(), async (payload) => {
+        User.findById(socket.user._id, (err, user) => {
+            if (!err) {
+                user.onlineUsers.push(socket.id)
+                user.save()
+                socket.broadcast.emit(socket.user.userName, "ONLINE")
+            }
+        })
 
-                const chatList = await ChatList.findById(chatId)
-                let date = Date.now()
-                chatList.chats.push({message: payload, date: date, sentBy: socket.user.userName})
-                await chatList.save()
-
-                socket.broadcast.emit(chatId.toString(), payload, socket.user.userName, date);
-                console.log("Message from chat ID: ", chatId.toString(), "message:", payload)
+        //Gets current list of all users and updates it
+        socket.on('status', (userName) => {
+            console.log(userName, 'requested')
+            User.findOne({userName: userName}, (err, user) => {
+                if (!err) {
+                    if (user)
+                        if (user.onlineUsers.length === 0) {
+                            socket.emit(userName, "OFFLINE")
+                            console.log('emitting', userName, 'offline')
+                        } else {
+                            socket.emit(userName, "ONLINE")
+                            console.log('emitting', userName, 'online')
+                        }
+                }
             })
         })
 
+        //Listener to get message and id, adds message to message list based on id
+        socket.on('message', async (message, chatId) => {
+            let date = Date.now()
+            const chatList = await ChatList.findById(chatId)
+            chatList.chats.push({message: message, date: date, sentBy: socket.user.userName})
+            await chatList.save()
+            socket.broadcast.emit(chatId.toString(), message, socket.user.userName, date);
+            console.log("Message from chat ID: ", chatId.toString(), "message:", message)
+        })
+
         socket.on('disconnect', () => {
-            socket.broadcast.emit("status", socket.user.userName, "OFFLINE")
+
+            //Updates disconnect user list by removing appended user list
+            User.findById(socket.user._id, (err, user) => {
+                if (!err) {
+                    user.onlineUsers = user.onlineUsers.filter(item => item !== socket.id)
+                    if (user.onlineUsers.length === 0) {
+                        io.emit(socket.user.userName, "OFFLINE")
+                    }
+                    user.save()
+                }
+            })
+
             console.log('user disconnected');
         });
     });
