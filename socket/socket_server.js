@@ -12,7 +12,12 @@ exports.setupSocket = (server) => {
         user.forEach((userData) => {
             console.log()
             userData.onlineUsers = []
-            userData.save()
+            delete userData.__v
+            try {
+                userData.save()
+            } catch (e) {
+                console.log(e)
+            }
         })
     })
 
@@ -51,8 +56,13 @@ exports.setupSocket = (server) => {
 
         User.findById(socket.user._id, (err, user) => {
             if (!err) {
+                delete user.__v
                 user.onlineUsers.push(socket.id)
-                user.save()
+                try {
+                    user.save()
+                } catch (e) {
+                    console.log(e)
+                }
                 socket.broadcast.emit(socket.user.userName, "ONLINE")
             }
         })
@@ -93,11 +103,16 @@ exports.setupSocket = (server) => {
             //Updates disconnect user list by removing appended user list
             User.findById(socket.user._id, (err, user) => {
                 if (!err) {
+                    delete user.__v
                     user.onlineUsers = user.onlineUsers.filter(item => item !== socket.id)
                     if (user.onlineUsers.length === 0) {
                         io.emit(socket.user.userName, "OFFLINE")
                     }
-                    user.save()
+                    try {
+                        user.save()
+                    } catch (e) {
+                        console.log(e)
+                    }
                 }
             })
 
