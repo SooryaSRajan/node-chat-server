@@ -6,6 +6,8 @@ const User = require("../models/user_model")
 const {io} = require("../socket/socket_server");
 const userNameRegex = /^[a-z0-9_.]+$/;
 
+const reservedKeyWords = ['status', 'message', 'disconnect', 'connection', 'new_user_socket_event']
+
 router.post("/login", function (req, res) {
 
     const {userName, password} = req.body
@@ -91,6 +93,16 @@ router.post("/register", function (req, res) {
         return;
     }
 
+    if(reservedKeyWords.includes(userName)){
+        res.status(400).json({message: "Username not allowed, try another username"})
+        return;
+    }
+
+    if(reservedKeyWords.includes(profileName)){
+        res.status(400).json({message: "Username not allowed, try another username"})
+        return;
+    }
+
     const verifyPassword = passwordStrength(password)
 
     if (verifyPassword.id < 2) {
@@ -128,7 +140,7 @@ router.post("/register", function (req, res) {
                     return;
                 }
 
-                io().emit("new_user", profileName, userName)
+                io().emit("new_user_socket_event", profileName, userName)
 
                 res.status(200).json({message: "User created", token: newUser.generateJWT()});
             });
